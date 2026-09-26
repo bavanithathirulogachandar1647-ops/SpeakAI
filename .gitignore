@@ -8,3 +8,7 @@ __pycache__/
 *.pyc
 
 .vscode/
+backend/.env
+.env
+node_modules/
+__pycache__/
