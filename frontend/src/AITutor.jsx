@@ -2,6 +2,7 @@ import { useState } from "react";
 
 function AITutor() {
     const userName = localStorage.getItem("user_name") || "Learner";
+    const API_URL = import.meta.env.VITE_API_URL;
 
     const [messages, setMessages] = useState([
         {
@@ -20,7 +21,6 @@ function AITutor() {
             return;
         }
 
-        // Add user's message
         setMessages((prev) => [
             ...prev,
             {
@@ -33,18 +33,15 @@ function AITutor() {
         setLoading(true);
 
         try {
-            const response = await fetch(
-                "http://127.0.0.1:5000/ai-tutor",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        question: question,
-                    }),
-                }
-            );
+            const response = await fetch(`${API_URL}/ai-tutor`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    question: question,
+                }),
+            });
 
             const data = await response.json();
 
@@ -95,13 +92,13 @@ function AITutor() {
         localStorage.removeItem("user_id");
         localStorage.removeItem("user_name");
         localStorage.removeItem("user_email");
+        localStorage.removeItem("access_token");
 
         window.location.href = "/";
     };
 
     return (
         <div style={styles.page}>
-            {/* Header */}
             <header style={styles.header}>
                 <div style={styles.logoSection}>
                     <div style={styles.logo}>S</div>
@@ -131,7 +128,6 @@ function AITutor() {
                 </div>
             </header>
 
-            {/* Main */}
             <main style={styles.main}>
                 <div style={styles.titleSection}>
                     <h1 style={styles.title}>AI Conversation</h1>
@@ -141,14 +137,16 @@ function AITutor() {
                     </p>
                 </div>
 
-                {/* Chat Box */}
                 <div style={styles.chatContainer}>
                     <div style={styles.chatHeader}>
                         <div style={styles.tutorInfo}>
                             <div style={styles.aiIcon}>AI</div>
 
                             <div>
-                                <div style={styles.tutorName}>SpeakAI Tutor</div>
+                                <div style={styles.tutorName}>
+                                    SpeakAI Tutor
+                                </div>
+
                                 <div style={styles.online}>
                                     <span style={styles.onlineDot}></span>
                                     Online
@@ -157,7 +155,6 @@ function AITutor() {
                         </div>
                     </div>
 
-                    {/* Messages */}
                     <div style={styles.messagesArea}>
                         {messages.map((message, index) => (
                             <div
@@ -187,7 +184,6 @@ function AITutor() {
                             </div>
                         ))}
 
-                        {/* Loading */}
                         {loading && (
                             <div style={styles.messageRow}>
                                 <div style={styles.smallAiIcon}>AI</div>
@@ -199,7 +195,6 @@ function AITutor() {
                         )}
                     </div>
 
-                    {/* Input */}
                     <div style={styles.inputSection}>
                         <textarea
                             value={input}
@@ -233,7 +228,6 @@ function AITutor() {
                     </div>
                 </div>
 
-                {/* Suggestions */}
                 <div style={styles.suggestions}>
                     <div style={styles.suggestionTitle}>
                         Try asking:
@@ -252,7 +246,9 @@ function AITutor() {
                         <button
                             style={styles.suggestionButton}
                             onClick={() =>
-                                setInput("How can I improve my English vocabulary?")
+                                setInput(
+                                    "How can I improve my English vocabulary?"
+                                )
                             }
                         >
                             Improve vocabulary
@@ -261,7 +257,9 @@ function AITutor() {
                         <button
                             style={styles.suggestionButton}
                             onClick={() =>
-                                setInput("Can you correct my English sentence?")
+                                setInput(
+                                    "Can you correct my English sentence?"
+                                )
                             }
                         >
                             Correct my sentence
