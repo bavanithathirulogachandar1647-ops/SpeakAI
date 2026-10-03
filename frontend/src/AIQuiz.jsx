@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function AIQuiz() {
     const [topic, setTopic] = useState("");
     const [quiz, setQuiz] = useState("");
@@ -20,7 +22,7 @@ function AIQuiz() {
 
         try {
             const response = await fetch(
-                "http://127.0.0.1:5000/generate-quiz",
+                `${API_URL}/generate-quiz`,
                 {
                     method: "POST",
                     headers: {
@@ -41,7 +43,6 @@ function AIQuiz() {
             }
 
             setQuiz(data.quiz || "No quiz received.");
-
         } catch (err) {
             console.error("QUIZ ERROR:", err);
             setError(err.message);
@@ -80,7 +81,7 @@ function AIQuiz() {
 
         try {
             const progressResponse = await fetch(
-                `http://127.0.0.1:5000/progress/${userId}`,
+                `${API_URL}/progress/${userId}`,
                 {
                     method: "GET",
                     headers: {
@@ -99,7 +100,7 @@ function AIQuiz() {
             }
 
             const updateResponse = await fetch(
-                "http://127.0.0.1:5000/progress",
+                `${API_URL}/progress`,
                 {
                     method: "POST",
                     headers: {
@@ -110,12 +111,9 @@ function AIQuiz() {
                         user_id: Number(userId),
                         vocabulary_completed:
                             Number(progress.vocabulary_completed || 0),
-
                         grammar_completed:
                             Number(progress.grammar_completed || 0),
-
                         quiz_score: quizScore,
-
                         pronunciation_completed:
                             Number(
                                 progress.pronunciation_completed || 0
@@ -134,7 +132,6 @@ function AIQuiz() {
 
             setScore(quizScore);
             alert("Quiz score saved successfully! 🎉");
-
         } catch (err) {
             console.error("QUIZ SCORE ERROR:", err);
             setError(err.message);
