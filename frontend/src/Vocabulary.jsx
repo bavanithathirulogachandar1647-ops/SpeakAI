@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function Vocabulary() {
-    const [words, setWords] = useState([
+    const [words] = useState([
         {
             word: "Improve",
             meaning: "To make something better",
@@ -46,7 +48,7 @@ function Vocabulary() {
             }
 
             const response = await fetch(
-                `http://127.0.0.1:5000/progress/${userId}`,
+                `${API_URL}/progress/${userId}`,
                 {
                     method: "GET",
                     headers: {
@@ -65,7 +67,7 @@ function Vocabulary() {
             }
 
             const updateResponse = await fetch(
-                "http://127.0.0.1:5000/progress",
+                `${API_URL}/progress`,
                 {
                     method: "POST",
                     headers: {
@@ -116,9 +118,7 @@ function Vocabulary() {
 
     return (
         <div style={styles.page}>
-
             <div style={styles.card}>
-
                 <button
                     onClick={() => {
                         window.location.href = "/dashboard";
@@ -137,7 +137,6 @@ function Vocabulary() {
                 </p>
 
                 <div style={styles.wordCard}>
-
                     <div style={styles.wordNumber}>
                         Word {currentIndex + 1} of {words.length}
                     </div>
@@ -155,7 +154,6 @@ function Vocabulary() {
                         <strong>Example:</strong>{" "}
                         {currentWord.example}
                     </p>
-
                 </div>
 
                 {!completed ? (
@@ -179,19 +177,15 @@ function Vocabulary() {
                         {message}
                     </div>
                 )}
-
             </div>
-
         </div>
     );
 }
 
 const styles = {
-
     page: {
         minHeight: "100vh",
-        background:
-            "linear-gradient(135deg, #eef2ff, #f8fafc)",
+        background: "linear-gradient(135deg, #eef2ff, #f8fafc)",
         padding: "40px 20px",
         fontFamily: "Arial, sans-serif",
     },
