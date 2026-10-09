@@ -1,5 +1,7 @@
 import React, { useRef, useState } from "react";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function Pronunciation() {
     const [sentence, setSentence] = useState("");
     const [recognizedText, setRecognizedText] = useState("");
@@ -11,9 +13,6 @@ function Pronunciation() {
 
     const recognitionRef = useRef(null);
 
-    // -----------------------------------------
-    // START SPEAKING / MICROPHONE
-    // -----------------------------------------
     const startListening = () => {
         const SpeechRecognition =
             window.SpeechRecognition ||
@@ -52,7 +51,6 @@ function Pronunciation() {
 
         recognition.onerror = (event) => {
             console.log("Speech recognition error:", event.error);
-
             setListening(false);
 
             if (event.error === "not-allowed") {
@@ -60,7 +58,9 @@ function Pronunciation() {
                     "Microphone permission was denied. Please allow microphone access."
                 );
             } else {
-                setMessage("Could not recognize your speech. Please try again.");
+                setMessage(
+                    "Could not recognize your speech. Please try again."
+                );
             }
         };
 
@@ -69,13 +69,9 @@ function Pronunciation() {
         };
 
         recognitionRef.current = recognition;
-
         recognition.start();
     };
 
-    // -----------------------------------------
-    // STOP LISTENING
-    // -----------------------------------------
     const stopListening = () => {
         if (recognitionRef.current) {
             recognitionRef.current.stop();
@@ -84,9 +80,6 @@ function Pronunciation() {
         setListening(false);
     };
 
-    // -----------------------------------------
-    // LISTEN TO EXAMPLE SENTENCE
-    // -----------------------------------------
     const listenSentence = () => {
         if (!sentence.trim()) {
             setMessage("Please enter a sentence first.");
@@ -102,9 +95,6 @@ function Pronunciation() {
         window.speechSynthesis.speak(speech);
     };
 
-    // -----------------------------------------
-    // GET AI FEEDBACK
-    // -----------------------------------------
     const getAIFeedback = async () => {
         if (!recognizedText.trim()) {
             setMessage("Please speak a sentence first.");
@@ -125,14 +115,12 @@ function Pronunciation() {
 
         try {
             const response = await fetch(
-                "http://127.0.0.1:5000/speaking-practice",
+                `${API_URL}/speaking-practice`,
                 {
                     method: "POST",
-
                     headers: {
                         "Content-Type": "application/json",
                     },
-
                     body: JSON.stringify({
                         text: recognizedText,
                         user_id: Number(userId),
@@ -171,9 +159,6 @@ function Pronunciation() {
         }
     };
 
-    // -----------------------------------------
-    // EXAMPLE SENTENCES
-    // -----------------------------------------
     const examples = [
         "I am learning English every day.",
         "I want to improve my speaking skills.",
@@ -189,21 +174,15 @@ function Pronunciation() {
         setMessage("");
     };
 
-    // -----------------------------------------
-    // PAGE UI
-    // -----------------------------------------
     return (
         <div
             style={{
                 minHeight: "100vh",
-                background:
-                    "linear-gradient(135deg, #eef5ff, #f8fbff)",
-                fontFamily:
-                    "Arial, Helvetica, sans-serif",
+                background: "linear-gradient(135deg, #eef5ff, #f8fbff)",
+                fontFamily: "Arial, Helvetica, sans-serif",
                 paddingBottom: "50px",
             }}
         >
-            {/* HEADER */}
             <div
                 style={{
                     background: "#ffffff",
@@ -258,6 +237,7 @@ function Pronunciation() {
 
                     <button
                         onClick={() => {
+                            localStorage.removeItem("access_token");
                             localStorage.removeItem("user_id");
                             localStorage.removeItem("user_name");
                             localStorage.removeItem("user_email");
@@ -279,7 +259,6 @@ function Pronunciation() {
                 </div>
             </div>
 
-            {/* MAIN CONTENT */}
             <div
                 style={{
                     maxWidth: "1000px",
@@ -287,7 +266,6 @@ function Pronunciation() {
                     padding: "0 20px",
                 }}
             >
-                {/* TITLE */}
                 <div
                     style={{
                         textAlign: "center",
@@ -314,14 +292,12 @@ function Pronunciation() {
                     </p>
                 </div>
 
-                {/* PRACTICE CARD */}
                 <div
                     style={{
                         background: "#ffffff",
                         borderRadius: "20px",
                         padding: "30px",
-                        boxShadow:
-                            "0 10px 30px rgba(0,0,0,0.08)",
+                        boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
                         marginBottom: "25px",
                     }}
                 >
@@ -343,7 +319,7 @@ function Pronunciation() {
                             setScore(null);
                         }}
                         placeholder="Enter a sentence or use the microphone..."
-                        rows="4"
+                        rows={4}
                         style={{
                             width: "100%",
                             boxSizing: "border-box",
@@ -356,7 +332,6 @@ function Pronunciation() {
                         }}
                     />
 
-                    {/* BUTTONS */}
                     <div
                         style={{
                             display: "flex",
@@ -419,27 +394,20 @@ function Pronunciation() {
                             onClick={getAIFeedback}
                             disabled={loading}
                             style={{
-                                background: loading
-                                    ? "#93c5fd"
-                                    : "#16a34a",
+                                background: loading ? "#93c5fd" : "#16a34a",
                                 color: "#ffffff",
                                 border: "none",
                                 padding: "13px 22px",
                                 borderRadius: "10px",
-                                cursor: loading
-                                    ? "not-allowed"
-                                    : "pointer",
+                                cursor: loading ? "not-allowed" : "pointer",
                                 fontWeight: "600",
                                 fontSize: "15px",
                             }}
                         >
-                            {loading
-                                ? "Checking..."
-                                : "🤖 Get AI Feedback"}
+                            {loading ? "Checking..." : "🤖 Get AI Feedback"}
                         </button>
                     </div>
 
-                    {/* STATUS MESSAGE */}
                     {message && (
                         <div
                             style={{
@@ -456,24 +424,17 @@ function Pronunciation() {
                     )}
                 </div>
 
-                {/* RECOGNIZED SPEECH */}
                 {recognizedText && (
                     <div
                         style={{
                             background: "#ffffff",
                             borderRadius: "20px",
                             padding: "25px",
-                            boxShadow:
-                                "0 8px 25px rgba(0,0,0,0.06)",
+                            boxShadow: "0 8px 25px rgba(0,0,0,0.06)",
                             marginBottom: "25px",
                         }}
                     >
-                        <h3
-                            style={{
-                                marginTop: 0,
-                                color: "#111827",
-                            }}
-                        >
+                        <h3 style={{ marginTop: 0, color: "#111827" }}>
                             🗣️ Recognized Speech
                         </h3>
 
@@ -491,7 +452,6 @@ function Pronunciation() {
                     </div>
                 )}
 
-                {/* SCORE */}
                 {score !== null && (
                     <div
                         style={{
@@ -499,8 +459,7 @@ function Pronunciation() {
                             borderRadius: "20px",
                             padding: "30px",
                             textAlign: "center",
-                            boxShadow:
-                                "0 8px 25px rgba(0,0,0,0.06)",
+                            boxShadow: "0 8px 25px rgba(0,0,0,0.06)",
                             marginBottom: "25px",
                         }}
                     >
@@ -545,24 +504,17 @@ function Pronunciation() {
                     </div>
                 )}
 
-                {/* AI FEEDBACK */}
                 {feedback && (
                     <div
                         style={{
                             background: "#ffffff",
                             borderRadius: "20px",
                             padding: "30px",
-                            boxShadow:
-                                "0 8px 25px rgba(0,0,0,0.06)",
+                            boxShadow: "0 8px 25px rgba(0,0,0,0.06)",
                             marginBottom: "25px",
                         }}
                     >
-                        <h3
-                            style={{
-                                marginTop: 0,
-                                color: "#111827",
-                            }}
-                        >
+                        <h3 style={{ marginTop: 0, color: "#111827" }}>
                             🤖 AI Feedback
                         </h3>
 
@@ -582,40 +534,23 @@ function Pronunciation() {
                     </div>
                 )}
 
-                {/* EXAMPLES */}
                 <div
                     style={{
                         background: "#ffffff",
                         borderRadius: "20px",
                         padding: "30px",
-                        boxShadow:
-                            "0 8px 25px rgba(0,0,0,0.06)",
+                        boxShadow: "0 8px 25px rgba(0,0,0,0.06)",
                     }}
                 >
-                    <h3
-                        style={{
-                            marginTop: 0,
-                            color: "#111827",
-                        }}
-                    >
+                    <h3 style={{ marginTop: 0, color: "#111827" }}>
                         💡 Practice Sentences
                     </h3>
 
-                    <p
-                        style={{
-                            color: "#6b7280",
-                            fontSize: "14px",
-                        }}
-                    >
+                    <p style={{ color: "#6b7280", fontSize: "14px" }}>
                         Choose a sentence and practice speaking it.
                     </p>
 
-                    <div
-                        style={{
-                            display: "grid",
-                            gap: "12px",
-                        }}
-                    >
+                    <div style={{ display: "grid", gap: "12px" }}>
                         {examples.map((example, index) => (
                             <button
                                 key={index}
@@ -637,7 +572,6 @@ function Pronunciation() {
                     </div>
                 </div>
 
-                {/* TIPS */}
                 <div
                     style={{
                         marginTop: "25px",
@@ -646,12 +580,7 @@ function Pronunciation() {
                         padding: "25px",
                     }}
                 >
-                    <h3
-                        style={{
-                            marginTop: 0,
-                            color: "#1e40af",
-                        }}
-                    >
+                    <h3 style={{ marginTop: 0, color: "#1e40af" }}>
                         📌 Speaking Tips
                     </h3>
 
