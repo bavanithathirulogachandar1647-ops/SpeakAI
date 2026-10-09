@@ -1,9 +1,11 @@
+
 import { useEffect, useState } from "react";
 
 function Dashboard() {
     const userId = localStorage.getItem("user_id");
     const userName = localStorage.getItem("user_name");
     const token = localStorage.getItem("access_token");
+    const API_URL = import.meta.env.VITE_API_URL;
 
     const [progress, setProgress] = useState({
         vocabulary_completed: 0,
@@ -24,7 +26,7 @@ function Dashboard() {
 
             try {
                 const response = await fetch(
-                    `http://127.0.0.1:5000/progress/${userId}`,
+                    `${API_URL}/progress/${userId}`,
                     {
                         method: "GET",
                         headers: {
@@ -35,8 +37,6 @@ function Dashboard() {
                 );
 
                 const data = await response.json();
-
-                console.log("DASHBOARD PROGRESS:", data);
 
                 if (!response.ok) {
                     throw new Error(data.error || "Unable to get progress");
@@ -49,7 +49,6 @@ function Dashboard() {
                     pronunciation_completed:
                         data.pronunciation_completed || 0,
                 });
-
             } catch (err) {
                 console.error("DASHBOARD ERROR:", err);
                 setError(err.message);
@@ -59,7 +58,7 @@ function Dashboard() {
         };
 
         fetchProgress();
-    }, [userId, token]);
+    }, [userId, token, API_URL]);
 
     const vocabularyProgress = Math.min(
         progress.vocabulary_completed * 10,
@@ -90,7 +89,6 @@ function Dashboard() {
         localStorage.removeItem("user_id");
         localStorage.removeItem("user_name");
         localStorage.removeItem("user_email");
-
         window.location.href = "/";
     };
 
@@ -100,8 +98,6 @@ function Dashboard() {
 
     return (
         <div style={styles.page}>
-
-            {/* Header */}
             <header style={styles.header}>
                 <div>
                     <h1 style={styles.logo}>🌐 SpeakAI</h1>
@@ -115,32 +111,25 @@ function Dashboard() {
                 </button>
             </header>
 
-            {/* Welcome */}
             <section style={styles.welcome}>
-                <h2>
-                    Welcome, {userName || "Learner"} 👋
-                </h2>
-
+                <h2>Welcome, {userName || "Learner"} 👋</h2>
                 <p>
                     Continue your English learning journey with SpeakAI.
                 </p>
             </section>
 
-            {/* Error */}
             {error && (
                 <div style={styles.error}>
                     <strong>Error:</strong> {error}
                 </div>
             )}
 
-            {/* Loading */}
             {loading ? (
                 <div style={styles.loading}>
                     Loading your progress...
                 </div>
             ) : (
                 <>
-                    {/* Overall Progress */}
                     <section style={styles.overallCard}>
                         <div>
                             <h2>📊 Overall Learning Progress</h2>
@@ -164,13 +153,11 @@ function Dashboard() {
                         </div>
                     </section>
 
-                    {/* Features */}
                     <h2 style={styles.sectionTitle}>
                         🚀 Learning Features
                     </h2>
 
                     <div style={styles.featureGrid}>
-
                         <FeatureCard
                             icon="🇬🇧"
                             title="English Learning"
@@ -234,15 +221,12 @@ function Dashboard() {
                             button="View Progress"
                             onClick={() => openFeature("/progress")}
                         />
-
                     </div>
 
-                    {/* Progress Summary */}
                     <section style={styles.summaryCard}>
                         <h2>📈 Your Learning Summary</h2>
 
                         <div style={styles.summaryGrid}>
-
                             <SummaryItem
                                 title="Vocabulary"
                                 value={`${vocabularyProgress}%`}
@@ -262,11 +246,9 @@ function Dashboard() {
                                 title="Speaking"
                                 value={`${speakingProgress}%`}
                             />
-
                         </div>
                     </section>
 
-                    {/* Progress Button */}
                     <div style={styles.bottomSection}>
                         <button
                             onClick={() => openFeature("/progress")}
@@ -275,7 +257,6 @@ function Dashboard() {
                             📊 View Detailed Progress
                         </button>
                     </div>
-
                 </>
             )}
 
@@ -284,47 +265,23 @@ function Dashboard() {
                     © 2026 SpeakAI • AI-Powered Language Learning
                 </p>
             </footer>
-
         </div>
     );
 }
 
-
-/* Feature Card */
-
-function FeatureCard({
-    icon,
-    title,
-    description,
-    button,
-    onClick,
-}) {
+function FeatureCard({ icon, title, description, button, onClick }) {
     return (
         <div style={styles.featureCard}>
-
-            <div style={styles.featureIcon}>
-                {icon}
-            </div>
-
+            <div style={styles.featureIcon}>{icon}</div>
             <h3>{title}</h3>
+            <p style={styles.featureDescription}>{description}</p>
 
-            <p style={styles.featureDescription}>
-                {description}
-            </p>
-
-            <button
-                onClick={onClick}
-                style={styles.featureButton}
-            >
+            <button onClick={onClick} style={styles.featureButton}>
                 {button}
             </button>
-
         </div>
     );
 }
-
-
-/* Summary Item */
 
 function SummaryItem({ title, value }) {
     return (
@@ -335,18 +292,13 @@ function SummaryItem({ title, value }) {
     );
 }
 
-
-/* Styles */
-
 const styles = {
     page: {
         minHeight: "100vh",
-        background:
-            "linear-gradient(135deg, #eef2ff, #f8fafc)",
+        background: "linear-gradient(135deg, #eef2ff, #f8fafc)",
         fontFamily: "Arial, sans-serif",
         paddingBottom: "40px",
     },
-
     header: {
         background: "#ffffff",
         padding: "20px 40px",
@@ -355,19 +307,16 @@ const styles = {
         alignItems: "center",
         boxShadow: "0 4px 15px rgba(0,0,0,0.06)",
     },
-
     logo: {
         margin: 0,
         fontSize: "30px",
         color: "#4f46e5",
     },
-
     tagline: {
         margin: "5px 0 0",
         color: "#64748b",
         fontSize: "14px",
     },
-
     logoutButton: {
         background: "#ef4444",
         color: "#ffffff",
@@ -377,21 +326,17 @@ const styles = {
         cursor: "pointer",
         fontWeight: "bold",
     },
-
     welcome: {
         maxWidth: "1100px",
         margin: "35px auto 20px",
         padding: "0 20px",
     },
-
     welcomeTitle: {
         fontSize: "28px",
     },
-
     welcomeText: {
         color: "#64748b",
     },
-
     overallCard: {
         maxWidth: "1060px",
         margin: "25px auto",
@@ -404,13 +349,11 @@ const styles = {
         alignItems: "center",
         gap: "30px",
     },
-
     progressText: {
         color: "#4f46e5",
         fontWeight: "bold",
         fontSize: "20px",
     },
-
     progressBarBackground: {
         width: "600px",
         maxWidth: "100%",
@@ -419,14 +362,12 @@ const styles = {
         borderRadius: "20px",
         overflow: "hidden",
     },
-
     progressBar: {
         height: "100%",
         background: "#4f46e5",
         borderRadius: "20px",
         transition: "width 0.5s ease",
     },
-
     progressCircle: {
         width: "100px",
         height: "100px",
@@ -439,23 +380,19 @@ const styles = {
         fontWeight: "bold",
         fontSize: "22px",
     },
-
     sectionTitle: {
         maxWidth: "1100px",
         margin: "35px auto 20px",
         padding: "0 20px",
     },
-
     featureGrid: {
         maxWidth: "1100px",
         margin: "0 auto",
         padding: "0 20px",
         display: "grid",
-        gridTemplateColumns:
-            "repeat(auto-fit, minmax(240px, 1fr))",
+        gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
         gap: "20px",
     },
-
     featureCard: {
         background: "#ffffff",
         padding: "25px",
@@ -464,18 +401,15 @@ const styles = {
         textAlign: "center",
         transition: "transform 0.2s",
     },
-
     featureIcon: {
         fontSize: "42px",
         marginBottom: "10px",
     },
-
     featureDescription: {
         color: "#64748b",
         minHeight: "45px",
         lineHeight: "1.5",
     },
-
     featureButton: {
         marginTop: "15px",
         width: "100%",
@@ -487,7 +421,6 @@ const styles = {
         fontWeight: "bold",
         cursor: "pointer",
     },
-
     summaryCard: {
         maxWidth: "1060px",
         margin: "35px auto",
@@ -496,32 +429,26 @@ const styles = {
         borderRadius: "20px",
         boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
     },
-
     summaryGrid: {
         display: "grid",
-        gridTemplateColumns:
-            "repeat(auto-fit, minmax(160px, 1fr))",
+        gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
         gap: "15px",
         marginTop: "20px",
     },
-
     summaryItem: {
         background: "#f8fafc",
         padding: "20px",
         borderRadius: "15px",
         textAlign: "center",
     },
-
     summaryValue: {
         fontSize: "26px",
         color: "#4f46e5",
     },
-
     bottomSection: {
         textAlign: "center",
         marginTop: "30px",
     },
-
     progressButton: {
         padding: "14px 25px",
         border: "none",
@@ -532,14 +459,12 @@ const styles = {
         fontSize: "16px",
         cursor: "pointer",
     },
-
     loading: {
         textAlign: "center",
         marginTop: "60px",
         fontSize: "18px",
         color: "#64748b",
     },
-
     error: {
         maxWidth: "1060px",
         margin: "20px auto",
@@ -548,7 +473,6 @@ const styles = {
         color: "#991b1b",
         borderRadius: "10px",
     },
-
     footer: {
         textAlign: "center",
         marginTop: "50px",
