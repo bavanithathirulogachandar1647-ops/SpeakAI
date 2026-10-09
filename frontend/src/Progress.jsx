@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function Progress() {
     const userId = localStorage.getItem("user_id");
     const userName = localStorage.getItem("user_name") || "Learner";
@@ -31,7 +33,7 @@ function Progress() {
 
         try {
             const response = await fetch(
-                `http://127.0.0.1:5000/progress/${userId}`,
+                `${API_URL}/progress/${userId}`,
                 {
                     method: "GET",
                     headers: {
@@ -54,26 +56,20 @@ function Progress() {
             setProgress({
                 vocabulary_completed:
                     data.vocabulary_completed || 0,
-
                 grammar_completed:
                     data.grammar_completed || 0,
-
                 quiz_score:
                     data.quiz_score || 0,
-
                 pronunciation_completed:
                     data.pronunciation_completed || 0,
             });
-
         } catch (error) {
             console.error("Progress error:", error);
             setError(error.message);
+        } finally {
+            setLoading(false);
         }
-
-        setLoading(false);
     };
-
-    // Convert completed activities to percentages
 
     const vocabularyProgress = Math.min(
         progress.vocabulary_completed * 10,
@@ -144,9 +140,6 @@ function Progress() {
                 color: "#1e293b",
             }}
         >
-
-            {/* ================= HEADER ================= */}
-
             <header
                 style={{
                     background: "#ffffff",
@@ -159,7 +152,6 @@ function Progress() {
                     boxSizing: "border-box",
                 }}
             >
-
                 <div
                     style={{
                         display: "flex",
@@ -167,10 +159,7 @@ function Progress() {
                         gap: "10px",
                     }}
                 >
-
-                    <span style={{ fontSize: "32px" }}>
-                        🗣️
-                    </span>
+                    <span style={{ fontSize: "32px" }}>🗣️</span>
 
                     <h2
                         style={{
@@ -181,7 +170,6 @@ function Progress() {
                     >
                         SpeakAI
                     </h2>
-
                 </div>
 
                 <div
@@ -191,7 +179,6 @@ function Progress() {
                         gap: "15px",
                     }}
                 >
-
                     <span
                         style={{
                             fontWeight: "600",
@@ -215,12 +202,8 @@ function Progress() {
                     >
                         Logout
                     </button>
-
                 </div>
-
             </header>
-
-            {/* ================= MAIN ================= */}
 
             <main
                 style={{
@@ -230,19 +213,13 @@ function Progress() {
                     boxSizing: "border-box",
                 }}
             >
-
-                {/* Page Title */}
-
                 <div
                     style={{
                         textAlign: "center",
                         marginBottom: "35px",
                     }}
                 >
-
-                    <div style={{ fontSize: "55px" }}>
-                        📊
-                    </div>
+                    <div style={{ fontSize: "55px" }}>📊</div>
 
                     <h1
                         style={{
@@ -263,11 +240,9 @@ function Progress() {
                     >
                         Track your English learning journey with SpeakAI.
                     </p>
-
                 </div>
 
                 {loading ? (
-
                     <div
                         style={{
                             background: "white",
@@ -278,9 +253,7 @@ function Progress() {
                     >
                         Loading your progress...
                     </div>
-
                 ) : error ? (
-
                     <div
                         style={{
                             background: "#fee2e2",
@@ -294,7 +267,6 @@ function Progress() {
                         <strong>Error:</strong>
                         <br />
                         {error}
-
                         <br />
                         <br />
 
@@ -315,13 +287,8 @@ function Progress() {
                             Login Again
                         </button>
                     </div>
-
                 ) : (
-
                     <>
-
-                        {/* ================= OVERALL ================= */}
-
                         <section
                             style={{
                                 background:
@@ -333,7 +300,6 @@ function Progress() {
                                 boxSizing: "border-box",
                             }}
                         >
-
                             <div
                                 style={{
                                     display: "flex",
@@ -343,9 +309,7 @@ function Progress() {
                                     flexWrap: "wrap",
                                 }}
                             >
-
                                 <div>
-
                                     <h2
                                         style={{
                                             margin: 0,
@@ -364,7 +328,6 @@ function Progress() {
                                     >
                                         Keep learning, keep improving!
                                     </p>
-
                                 </div>
 
                                 <div
@@ -375,7 +338,6 @@ function Progress() {
                                 >
                                     {overallProgress}%
                                 </div>
-
                             </div>
 
                             <div
@@ -387,7 +349,6 @@ function Progress() {
                                     overflow: "hidden",
                                 }}
                             >
-
                                 <div
                                     style={{
                                         width: `${overallProgress}%`,
@@ -397,12 +358,8 @@ function Progress() {
                                         transition: "width 0.6s ease",
                                     }}
                                 />
-
                             </div>
-
                         </section>
-
-                        {/* ================= LEVEL ================= */}
 
                         <section
                             style={{
@@ -414,10 +371,7 @@ function Progress() {
                                 textAlign: "center",
                             }}
                         >
-
-                            <div style={{ fontSize: "42px" }}>
-                                🏆
-                            </div>
+                            <div style={{ fontSize: "42px" }}>🏆</div>
 
                             <h2
                                 style={{
@@ -437,10 +391,7 @@ function Progress() {
                             >
                                 {getMessage()}
                             </p>
-
                         </section>
-
-                        {/* ================= SKILLS ================= */}
 
                         <h2
                             style={{
@@ -460,7 +411,6 @@ function Progress() {
                                 marginBottom: "35px",
                             }}
                         >
-
                             <SkillCard
                                 icon="📖"
                                 title="Vocabulary"
@@ -488,10 +438,7 @@ function Progress() {
                                 completed={`${progress.pronunciation_completed} practices`}
                                 percentage={speakingProgress}
                             />
-
                         </div>
-
-                        {/* ================= SUMMARY ================= */}
 
                         <section
                             style={{
@@ -502,7 +449,6 @@ function Progress() {
                                 boxShadow: "0 5px 20px rgba(0,0,0,0.06)",
                             }}
                         >
-
                             <h2
                                 style={{
                                     marginTop: 0,
@@ -522,7 +468,6 @@ function Progress() {
                                     textAlign: "center",
                                 }}
                             >
-
                                 <SummaryItem
                                     number={progress.vocabulary_completed}
                                     label="Vocabulary Activities"
@@ -542,12 +487,8 @@ function Progress() {
                                     number={`${progress.quiz_score}%`}
                                     label="Quiz Score"
                                 />
-
                             </div>
-
                         </section>
-
-                        {/* ================= BUTTONS ================= */}
 
                         <div
                             style={{
@@ -557,7 +498,6 @@ function Progress() {
                                 flexWrap: "wrap",
                             }}
                         >
-
                             <button
                                 onClick={goDashboard}
                                 style={{
@@ -589,28 +529,15 @@ function Progress() {
                             >
                                 🔄 Refresh Progress
                             </button>
-
                         </div>
-
                     </>
-
                 )}
-
             </main>
-
         </div>
     );
 }
 
-
-/* ================= SKILL CARD ================= */
-
-function SkillCard({
-    icon,
-    title,
-    completed,
-    percentage,
-}) {
+function SkillCard({ icon, title, completed, percentage }) {
     return (
         <div
             style={{
@@ -620,18 +547,9 @@ function SkillCard({
                 boxShadow: "0 5px 20px rgba(0,0,0,0.06)",
             }}
         >
+            <div style={{ fontSize: "40px" }}>{icon}</div>
 
-            <div style={{ fontSize: "40px" }}>
-                {icon}
-            </div>
-
-            <h3
-                style={{
-                    margin: "12px 0 7px",
-                }}
-            >
-                {title}
-            </h3>
+            <h3 style={{ margin: "12px 0 7px" }}>{title}</h3>
 
             <p
                 style={{
@@ -650,13 +568,11 @@ function SkillCard({
                     fontWeight: "bold",
                 }}
             >
-
                 <span>Progress</span>
 
                 <span style={{ color: "#2563eb" }}>
                     {percentage}%
                 </span>
-
             </div>
 
             <div
@@ -667,7 +583,6 @@ function SkillCard({
                     overflow: "hidden",
                 }}
             >
-
                 <div
                     style={{
                         width: `${percentage}%`,
@@ -677,20 +592,12 @@ function SkillCard({
                         transition: "width 0.5s ease",
                     }}
                 />
-
             </div>
-
         </div>
     );
 }
 
-
-/* ================= SUMMARY ITEM ================= */
-
-function SummaryItem({
-    number,
-    label,
-}) {
+function SummaryItem({ number, label }) {
     return (
         <div
             style={{
@@ -699,7 +606,6 @@ function SummaryItem({
                 borderRadius: "14px",
             }}
         >
-
             <div
                 style={{
                     fontSize: "30px",
@@ -719,7 +625,6 @@ function SummaryItem({
             >
                 {label}
             </p>
-
         </div>
     );
 }
