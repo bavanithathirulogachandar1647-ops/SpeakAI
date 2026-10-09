@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function Grammar() {
     const [text, setText] = useState("");
     const [feedback, setFeedback] = useState("");
@@ -18,7 +20,7 @@ function Grammar() {
 
         try {
             const response = await fetch(
-                "http://127.0.0.1:5000/grammar-correction",
+                `${API_URL}/grammar-correction`,
                 {
                     method: "POST",
                     headers: {
@@ -54,9 +56,7 @@ function Grammar() {
 
     return (
         <div style={styles.page}>
-
             <div style={styles.card}>
-
                 <button
                     onClick={() => {
                         window.location.href = "/dashboard";
@@ -67,7 +67,7 @@ function Grammar() {
                 </button>
 
                 <h1 style={styles.title}>
-                    ✍️ Grammar Correction
+                    Grammar Correction
                 </h1>
 
                 <p style={styles.subtitle}>
@@ -79,7 +79,7 @@ function Grammar() {
                     onChange={(e) => setText(e.target.value)}
                     placeholder="Enter your English sentence here..."
                     style={styles.textarea}
-                    rows="6"
+                    rows={6}
                 />
 
                 <button
@@ -100,18 +100,13 @@ function Grammar() {
 
                 {feedback && (
                     <div style={styles.feedback}>
-
-                        <h2>🤖 AI Feedback</h2>
-
+                        <h2>AI Feedback</h2>
                         <div style={styles.feedbackText}>
                             {feedback}
                         </div>
-
                     </div>
                 )}
-
             </div>
-
         </div>
     );
 }
@@ -119,8 +114,7 @@ function Grammar() {
 const styles = {
     page: {
         minHeight: "100vh",
-        background:
-            "linear-gradient(135deg, #eef2ff, #f8fafc)",
+        background: "linear-gradient(135deg, #eef2ff, #f8fafc)",
         padding: "40px 20px",
         fontFamily: "Arial, sans-serif",
     },
@@ -131,8 +125,7 @@ const styles = {
         background: "#ffffff",
         padding: "35px",
         borderRadius: "20px",
-        boxShadow:
-            "0 10px 35px rgba(0,0,0,0.08)",
+        boxShadow: "0 10px 35px rgba(0,0,0,0.08)",
     },
 
     backButton: {
