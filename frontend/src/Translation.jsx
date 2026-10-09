@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function Translation() {
     const [fromLanguage, setFromLanguage] = useState("English");
     const [toLanguage, setToLanguage] = useState("Tamil");
@@ -18,7 +20,7 @@ function Translation() {
 
         try {
             const response = await fetch(
-                "http://127.0.0.1:5000/translate",
+                `${API_URL}/translate`,
                 {
                     method: "POST",
                     headers: {
@@ -39,14 +41,13 @@ function Translation() {
             } else {
                 setTranslation(data.message || "Translation failed.");
             }
-
         } catch (error) {
             setTranslation(
-                "Cannot connect to the server. Please make sure Flask is running."
+                "Cannot connect to the server. Please check your internet connection or backend deployment."
             );
+        } finally {
+            setLoading(false);
         }
-
-        setLoading(false);
     };
 
     return (
