@@ -1,33 +1,31 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-function Register() {
+const API_URL = import.meta.env.VITE_API_URL?.replace(/\/+$/, "");
+
+export default function Register() {
+  const navigate = useNavigate();
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleRegister = async (e) => {
     e.preventDefault();
-
     setError("");
     setSuccess("");
 
-    // Basic validation
-    if (!name.trim()) {
-      setError("Please enter your name.");
+    if (!API_URL) {
+      setError("Backend URL is missing. Please check Vercel settings.");
       return;
     }
 
-    if (!email.trim()) {
-      setError("Please enter your email.");
-      return;
-    }
-
-    if (!password) {
-      setError("Please enter a password.");
+    if (!name.trim() || !email.trim() || !password || !confirmPassword) {
+      setError("Please fill in all fields.");
       return;
     }
 
@@ -36,366 +34,249 @@ function Register() {
       return;
     }
 
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const response = await fetch(
-        "http://127.0.0.1:5000/register",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: name.trim(),
-            email: email.trim(),
-            password: password,
-          }),
-        }
-      );
+      const response = await fetch(`${API_URL}/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: name.trim(),
+          email: email.trim(),
+          password,
+        }),
+      });
 
-      const data = await response.json();
-
-      console.log("REGISTER RESPONSE:", data);
+      const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error(
-          data.error || "Registration failed."
+        setError(
+          data.message ||
+          data.error ||
+          "Registration failed. Please try again."
         );
+        return;
       }
 
-      setSuccess(
-        "Registration successful! You can now login."
-      );
+      setSuccess("Account created successfully! You can now log in.");
 
-      // Clear form
       setName("");
       setEmail("");
       setPassword("");
+      setConfirmPassword("");
 
+      window.setTimeout(() => {
+        navigate("/login");
+      }, 1500);
     } catch (err) {
-      console.error("REGISTER ERROR:", err);
-
+      console.error("Registration error:", err);
       setError(
-        err.message ||
-        "Unable to register. Please try again."
+        "Cannot connect to the server. Please check the backend and try again."
       );
-
     } finally {
       setLoading(false);
     }
   };
 
-  const goToLogin = () => {
-    window.location.href = "/";
-  };
-
   return (
     <div style={styles.page}>
-
       <div style={styles.card}>
-
-        {/* Logo */}
-        <div style={styles.logoContainer}>
-          <div style={styles.logoIcon}>
-            🌐
-          </div>
-
-          <h1 style={styles.logo}>
-            SpeakAI
-          </h1>
-
-          <p style={styles.tagline}>
-            AI-Powered Language Learning
-          </p>
-        </div>
-
-        {/* Title */}
-        <h2 style={styles.title}>
-          Create Your Account 🚀
-        </h2>
-
+        <h1 style={styles.title}>Create Account</h1>
         <p style={styles.subtitle}>
-          Join SpeakAI and start your AI-powered
-          language learning journey.
+          Join SpeakAI and start your language-learning journey.
         </p>
 
-        {/* Error */}
-        {error && (
-          <div style={styles.error}>
-            <strong>Registration Error</strong>
-            <br />
-            {error}
-          </div>
-        )}
-
-        {/* Success */}
-        {success && (
-          <div style={styles.success}>
-            <strong>Success!</strong>
-            <br />
-            {success}
-          </div>
-        )}
-
-        {/* Form */}
         <form onSubmit={handleRegister}>
-
-          {/* Name */}
-          <label style={styles.label}>
+          <label htmlFor="name" style={styles.label}>
             Full Name
           </label>
-
           <input
+            id="name"
             type="text"
-            value={name}
-            onChange={(e) =>
-              setName(e.target.value)
-            }
             placeholder="Enter your full name"
-            style={styles.input}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             autoComplete="name"
+            required
+            style={styles.input}
           />
 
-          {/* Email */}
-          <label style={styles.label}>
+          <label htmlFor="email" style={styles.label}>
             Email Address
           </label>
-
           <input
+            id="email"
             type="email"
-            value={email}
-            onChange={(e) =>
-              setEmail(e.target.value)
-            }
             placeholder="Enter your email"
-            style={styles.input}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             autoComplete="email"
+            required
+            style={styles.input}
           />
 
-          {/* Password */}
-          <label style={styles.label}>
+          <label htmlFor="password" style={styles.label}>
             Password
           </label>
-
           <input
+            id="password"
             type="password"
-            value={password}
-            onChange={(e) =>
-              setPassword(e.target.value)
-            }
             placeholder="Create a password"
-            style={styles.input}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             autoComplete="new-password"
+            minLength={6}
+            required
+            style={styles.input}
           />
 
-          <p style={styles.passwordHint}>
-            Password must contain at least 6 characters.
-          </p>
+          <label htmlFor="confirmPassword" style={styles.label}>
+            Confirm Password
+          </label>
+          <input
+            id="confirmPassword"
+            type="password"
+            placeholder="Re-enter your password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            autoComplete="new-password"
+            minLength={6}
+            required
+            style={styles.input}
+          />
 
-          {/* Register Button */}
+          {error && (
+            <p role="alert" style={styles.error}>
+              {error}
+            </p>
+          )}
+
+          {success && (
+            <p role="status" style={styles.success}>
+              {success}
+            </p>
+          )}
+
           <button
             type="submit"
             disabled={loading}
             style={{
-              ...styles.registerButton,
+              ...styles.button,
               opacity: loading ? 0.7 : 1,
-              cursor: loading
-                ? "not-allowed"
-                : "pointer",
             }}
           >
-            {loading
-              ? "Creating Account..."
-              : "Create Account"}
+            {loading ? "Creating Account..." : "Create Account"}
           </button>
-
         </form>
 
-        {/* Login */}
-        <div style={styles.loginSection}>
-
-          <p style={styles.loginText}>
-            Already have an account?
-          </p>
-
+        <p style={styles.footer}>
+          Already have an account?{" "}
           <button
-            onClick={goToLogin}
-            style={styles.loginButton}
+            type="button"
+            onClick={() => navigate("/login")}
+            style={styles.link}
           >
-            Login to SpeakAI
+            Login
           </button>
-
-        </div>
-
+        </p>
       </div>
-
-      {/* Footer */}
-      <p style={styles.footer}>
-        © 2026 SpeakAI • AI-Powered Language Learning
-      </p>
-
     </div>
   );
 }
 
-
-/* =========================
-   STYLES
-========================= */
-
 const styles = {
-
   page: {
     minHeight: "100vh",
-    background:
-      "linear-gradient(135deg, #eef2ff, #f8fafc)",
     display: "flex",
-    flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
-    padding: "30px 20px",
+    padding: "24px",
+    background: "linear-gradient(135deg, #e0e7ff, #f5f3ff, #eff6ff)",
     fontFamily: "Arial, sans-serif",
-    boxSizing: "border-box",
   },
-
   card: {
     width: "100%",
-    maxWidth: "450px",
-    background: "#ffffff",
-    padding: "40px",
-    borderRadius: "22px",
-    boxShadow:
-      "0 15px 40px rgba(0,0,0,0.10)",
+    maxWidth: "440px",
+    padding: "36px",
+    background: "#fff",
+    borderRadius: "18px",
+    boxShadow: "0 12px 40px rgba(30, 41, 59, 0.12)",
     boxSizing: "border-box",
   },
-
-  logoContainer: {
-    textAlign: "center",
-    marginBottom: "28px",
-  },
-
-  logoIcon: {
-    fontSize: "48px",
-    marginBottom: "5px",
-  },
-
-  logo: {
-    margin: "0",
-    color: "#4f46e5",
-    fontSize: "32px",
-    fontWeight: "700",
-  },
-
-  tagline: {
-    marginTop: "7px",
-    color: "#64748b",
-    fontSize: "14px",
-  },
-
   title: {
-    fontSize: "25px",
-    color: "#1e293b",
-    marginBottom: "8px",
+    margin: "0 0 10px",
+    color: "#312e81",
+    fontSize: "30px",
     textAlign: "center",
   },
-
   subtitle: {
+    margin: "0 0 28px",
     color: "#64748b",
-    fontSize: "15px",
     textAlign: "center",
-    marginBottom: "25px",
-    lineHeight: "1.5",
+    lineHeight: 1.5,
   },
-
   label: {
     display: "block",
     marginBottom: "8px",
-    marginTop: "18px",
     color: "#334155",
     fontSize: "14px",
     fontWeight: "600",
   },
-
   input: {
     width: "100%",
-    padding: "14px",
-    border:
-      "1px solid #cbd5e1",
-    borderRadius: "10px",
+    padding: "13px",
+    marginBottom: "18px",
+    border: "1px solid #cbd5e1",
+    borderRadius: "9px",
     fontSize: "15px",
     boxSizing: "border-box",
-    outline: "none",
   },
-
-  passwordHint: {
-    color: "#94a3b8",
-    fontSize: "12px",
-    marginTop: "7px",
-  },
-
-  registerButton: {
+  button: {
     width: "100%",
     padding: "14px",
-    marginTop: "22px",
-    border: "none",
-    borderRadius: "11px",
     background: "#4f46e5",
-    color: "#ffffff",
-    fontSize: "16px",
-    fontWeight: "bold",
-  },
-
-  error: {
-    background: "#fee2e2",
-    color: "#991b1b",
-    padding: "13px",
-    borderRadius: "10px",
-    fontSize: "14px",
-    lineHeight: "1.5",
-    marginBottom: "15px",
-  },
-
-  success: {
-    background: "#dcfce7",
-    color: "#166534",
-    padding: "13px",
-    borderRadius: "10px",
-    fontSize: "14px",
-    lineHeight: "1.5",
-    marginBottom: "15px",
-  },
-
-  loginSection: {
-    textAlign: "center",
-    marginTop: "28px",
-    paddingTop: "22px",
-    borderTop:
-      "1px solid #e2e8f0",
-  },
-
-  loginText: {
-    color: "#64748b",
-    fontSize: "14px",
-    marginBottom: "10px",
-  },
-
-  loginButton: {
-    background: "transparent",
+    color: "#fff",
     border: "none",
-    color: "#4f46e5",
-    fontSize: "15px",
+    borderRadius: "9px",
+    fontSize: "16px",
     fontWeight: "bold",
     cursor: "pointer",
   },
-
-  footer: {
-    marginTop: "20px",
-    color: "#64748b",
-    fontSize: "13px",
-    textAlign: "center",
+  error: {
+    padding: "10px",
+    background: "#fef2f2",
+    color: "#b91c1c",
+    borderRadius: "8px",
+    fontSize: "14px",
+    lineHeight: 1.5,
   },
-
+  success: {
+    padding: "10px",
+    background: "#f0fdf4",
+    color: "#166534",
+    borderRadius: "8px",
+    fontSize: "14px",
+    lineHeight: 1.5,
+  },
+  footer: {
+    marginTop: "24px",
+    textAlign: "center",
+    color: "#64748b",
+    fontSize: "14px",
+  },
+  link: {
+    border: "none",
+    background: "none",
+    color: "#4f46e5",
+    fontWeight: "bold",
+    cursor: "pointer",
+    fontSize: "14px",
+  },
 };
-
-export default Register;
